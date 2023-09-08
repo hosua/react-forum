@@ -1,2 +1,3 @@
-# react-forum
-A basic forum that uses reactJS and expressJS
+# Simple React Forum
+
+TODO: Add README content
