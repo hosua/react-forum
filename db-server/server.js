@@ -1,6 +1,13 @@
 const express = require('express');
 const connection = require('./db-config.js');
 
+function intToIPv4(ipInt) {
+	return ((ipInt >>> 24) + '.' + (ipInt >> 16 & 255) + '.' + (ipInt >> 8 & 255) + '.' + (ipInt & 255));
+}
+
+function IPv4ToInt(ip) {
+	return ip.split('.').reduce(function (ipInt, octet) { return (ipInt << 8) + parseInt(octet, 10) }, 0) >>> 0;
+}
 
 const app = express();
 app.use(express.json());
@@ -33,11 +40,13 @@ app.post("/forum/api/post-msg", (req, res) => {
 	console.log("Posting message to server");
 	console.log(`REQ: ${req.body}`);
 
-	const { title, msg } = req.body;
+	const { title, msg, userIP } = req.body;
+	const userIPint = IPv4ToInt(userIP);
+	const userIPbackTest = intToIPv4(userIPint);
+	console.log(`user from: ${userIPbackTest} posted a message`)
+	const query = `INSERT INTO msg_table (title, msg, user_ip, post_time) VALUES (?, ?, ?, NOW())`;
 
-	const query = `INSERT INTO msg_table (title, msg, post_time) VALUES (?, ?, NOW())`;
-
-	connection.query(query, [title, msg], (err, results, field) => {
+	connection.query(query, [title, msg, userIPint], (err, results, field) => {
 		if (err) {
 			console.log(err);
 			connection.end();

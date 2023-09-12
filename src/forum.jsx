@@ -44,6 +44,7 @@ function Forum() {
     const [postTitle, setPostTitle] = useState('');
     const [postMsg, setPostMsg] = useState('');
     const [postList, setPostList] = useState([]);
+    const [userIP, setUserIP] = useState('');
 
     const fetchData = async () => {
         try {
@@ -57,7 +58,6 @@ function Forum() {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log(`${JSON.stringify(data)}`);
                 setPostList(data);
             } else {
                 console.error('Failed to fetch data');
@@ -82,6 +82,7 @@ function Forum() {
                     body: JSON.stringify({
                         title: postTitle,
                         msg: postMsg,
+                        userIP: userIP,
                     }),
                 });
 
@@ -116,7 +117,6 @@ function Forum() {
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(`${JSON.stringify(data)}`);
                     setPostList(data);
                 } else {
                     console.error('Failed to fetch data');
@@ -128,6 +128,15 @@ function Forum() {
 
         fetchData();
     }, []); // Empty dependency array to run the effect only once after the initial render
+
+    // grab the user's IP address
+    useEffect(() => {
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => setUserIP(data.ip))
+            .catch(error => console.log(error))
+
+    }, [])
 
     const handleTitleChange = (e) => {
         setPostTitle(e.target.value);
